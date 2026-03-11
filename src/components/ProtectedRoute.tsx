@@ -1,102 +1,44 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/components/ProtectedRoute.tsx
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft } from "lucide-react"; // seta do botão
+import { Navigate } from "react-router-dom";
 
-export default function AdminLogin() {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMessage("");
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
 
-    setLoading(false);
+      if (session) {
+        const user = session.user;
+        const roles = user.raw_app_meta_data?.roles || [];
+        if (roles.includes("admin")) {
+          setSession(session);
+        } else {
+          setSession(null);
+        }
+      } else {
+        setSession(null);
+      }
 
-    if (error) {
-      setErrorMessage(error.message);
-    } else if (data.session) {
-      navigate("/admin"); // redireciona após login
-    }
-  };
+      setLoading(false);
+    };
 
-  return (
-    <div
-      className="flex items-start justify-center min-h-screen bg-cover bg-center"
-      style={{ backgroundImage: `url('/veolia.jpg')` }}
-    >
-      {/* Botão para voltar ao Dashboard */}
-      <div className="absolute top-4 left-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft size={16} />
-          Dashboard
-        </Button>
-      </div>
+    checkSession();
+  }, []);
 
-      {/* Card com efeito blur, deslocado para baixo para mostrar logo */}
-      <div className="bg-black/50 backdrop-blur-md rounded-lg w-full max-w-md p-0.2 mt-110 sm:mt-98">
-        <Card className="bg-black/80 text-yellow-400 rounded-lg shadow-lg">
-          <CardHeader>
-            <CardTitle>Admin Login</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {errorMessage && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
+  if (loading) return null;
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="admin@exemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+  if (!session) {
+    return <Navigate to="/admin-login" />;
+  }
 
-              <div>
-                <Label htmlFor="password">Senha</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Sua senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Entrando..." : "Entrar"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+  return <>{children}</>;
 }
