@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
 import AdminLogin from "./pages/AdminLogin";
+import OrdersTable from "./pages/OrdersTable";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -22,6 +23,9 @@ const App = () => (
         <Routes>
           {/* Dashboard público */}
           <Route path="/" element={<Index />} />
+          
+          {/* Tabela de Ordens pública com filtro via query params */}
+          <Route path="/ordens" element={<OrdersTable />} />
 
           {/* Login do admin */}
           <Route path="/admin-login" element={<AdminLogin />} />

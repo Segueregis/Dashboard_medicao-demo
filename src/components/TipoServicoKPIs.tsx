@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import type { OrdemServico } from "@/lib/types";
 import { STATUS_LABELS, TIPO_SERVICO_LABELS } from "@/lib/types";
 
@@ -7,6 +8,7 @@ interface TipoServicoKPIsProps {
 }
 
 export function TipoServicoKPIs({ data }: TipoServicoKPIsProps) {
+  const navigate = useNavigate();
   const counts = useMemo(() => {
     const map: Record<string, number> = {};
     data.forEach((d) => {
@@ -27,7 +29,8 @@ export function TipoServicoKPIs({ data }: TipoServicoKPIsProps) {
       {items.map((item, i) => (
         <div
           key={item.code}
-          className={`kpi-card border-l-4 ${item.color} animate-fade-in`}
+          onClick={() => navigate(`/ordens?tipo=${item.code}`)}
+          className={`kpi-card border-l-4 ${item.color} animate-fade-in hover:scale-[1.02] cursor-pointer`}
           style={{ animationDelay: `${(i + 4) * 80}ms` }}
         >
           <span className="text-xs text-muted-foreground font-medium">

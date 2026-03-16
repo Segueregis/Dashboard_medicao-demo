@@ -29,8 +29,11 @@ const tooltipStyle = {
   fontSize: "13px",
 };
 
+import { useNavigate } from "react-router-dom";
+
 export function ChartBarTipoServico({ data }: ChartsProps) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const chartData = useMemo(() => {
     const counts: Record<string, number> = {};
     data.forEach((d) => {
@@ -42,6 +45,16 @@ export function ChartBarTipoServico({ data }: ChartsProps) {
 
   const colors = Object.values(TIPO_SERVICO_COLORS);
 
+  const handleBarClick = (entry: any) => {
+    // entry.name é o label ("Manutenção Corretiva"). Vamos achar o código ("CM").
+    const tipoEntry = Object.entries(TIPO_SERVICO_LABELS).find(([_, label]) => label === entry.name);
+    if (tipoEntry) {
+      navigate(`/ordens?tipo=${tipoEntry[0]}`);
+    } else {
+      navigate("/ordens");
+    }
+  };
+
   return (
     <div className="chart-container">
       <h3 className="text-sm font-semibold text-muted-foreground mb-3 sm:mb-4 uppercase tracking-wide">
@@ -52,10 +65,10 @@ export function ChartBarTipoServico({ data }: ChartsProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 20%, 22%)" />
           <XAxis dataKey="name" tick={{ fill: "hsl(215, 15%, 55%)", fontSize: isMobile ? 9 : 11 }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fill: "hsl(215, 15%, 55%)", fontSize: isMobile ? 9 : 11 }} axisLine={false} tickLine={false} width={isMobile ? 25 : 40} />
-          <Tooltip contentStyle={tooltipStyle} />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-            {chartData.map((_, i) => (
-              <Cell key={i} fill={colors[i % colors.length]} />
+          <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "hsl(222, 20%, 22%)", opacity: 0.2 }} />
+          <Bar dataKey="value" radius={[4, 4, 0, 0]} onClick={handleBarClick}>
+            {chartData.map((entry, i) => (
+              <Cell key={i} fill={colors[i % colors.length]} className="cursor-pointer hover:opacity-80 transition-opacity" />
             ))}
           </Bar>
         </BarChart>
@@ -66,6 +79,7 @@ export function ChartBarTipoServico({ data }: ChartsProps) {
 
 export function ChartPieStatus({ data }: ChartsProps) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const chartData = useMemo(() => {
     const counts: Record<string, number> = {};
     data.forEach((d) => {
@@ -78,6 +92,16 @@ export function ChartPieStatus({ data }: ChartsProps) {
   const colors = Object.values(STATUS_COLORS);
   const outerRadius = isMobile ? 70 : 100;
   const innerRadius = isMobile ? 40 : 60;
+
+  const handlePieClick = (entry: any) => {
+    // entry.name é o label ("Aprovada", "Concluída", etc)
+    const statusEntry = Object.entries(STATUS_LABELS).find(([_, label]) => label === entry.name);
+    if (statusEntry) {
+      navigate(`/ordens?status=${statusEntry[0]}`);
+    } else {
+      navigate("/ordens");
+    }
+  };
 
   return (
     <div className="chart-container">
@@ -94,14 +118,15 @@ export function ChartPieStatus({ data }: ChartsProps) {
             outerRadius={outerRadius}
             paddingAngle={3}
             dataKey="value"
+            onClick={handlePieClick}
             label={isMobile
               ? ({ percent }) => `${(percent * 100).toFixed(0)}%`
               : ({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`
             }
             labelLine={!isMobile}
           >
-            {chartData.map((_, i) => (
-              <Cell key={i} fill={colors[i % colors.length]} />
+            {chartData.map((entry, i) => (
+              <Cell key={i} fill={colors[i % colors.length]} className="cursor-pointer hover:opacity-80 transition-opacity" />
             ))}
           </Pie>
           <Tooltip contentStyle={tooltipStyle} />
@@ -114,6 +139,7 @@ export function ChartPieStatus({ data }: ChartsProps) {
 
 export function ChartLineByMonth({ data }: ChartsProps) {
   const [viewMode, setViewMode] = useState<"mensal" | "anual">("mensal");
+  const navigate = useNavigate();
 
   const chartData = useMemo(() => {
     const counts: Record<string, { total: number; proximas: number }> = {};
@@ -149,6 +175,14 @@ export function ChartLineByMonth({ data }: ChartsProps) {
   }, [data, viewMode]);
 
   const isMobile = useIsMobile();
+
+  const handleBarClick = (entry: any) => {
+    if (entry && entry.name) {
+      navigate(`/ordens?mes=${encodeURIComponent(entry.name)}`);
+    } else {
+      navigate("/ordens");
+    }
+  };
 
   return (
     <div className="chart-container">
@@ -189,7 +223,7 @@ export function ChartLineByMonth({ data }: ChartsProps) {
             cursor={{ fill: "hsl(222, 20%, 22%)", opacity: 0.4 }}
           />
           <Legend wrapperStyle={{ fontSize: "12px", color: "hsl(215, 15%, 55%)" }} />
-          <Bar dataKey="Total" fill="hsl(215, 25%, 35%)" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Total" fill="hsl(215, 25%, 35%)" radius={[4, 4, 0, 0]} onClick={handleBarClick} className="cursor-pointer hover:opacity-80 transition-opacity" />
           <Line 
             type="monotone" 
             dataKey="Próximas (30 dias)" 
@@ -197,6 +231,8 @@ export function ChartLineByMonth({ data }: ChartsProps) {
             strokeWidth={3} 
             dot={{ fill: "hsl(45, 100%, 55%)", r: 5, strokeWidth: 2 }} 
             connectNulls
+            onClick={handleBarClick}
+            className="cursor-pointer hover:opacity-80 transition-opacity"
           />
         </ComposedChart>
       </ResponsiveContainer>
@@ -205,6 +241,7 @@ export function ChartLineByMonth({ data }: ChartsProps) {
 }
 
 export function RankingAtivos({ data }: ChartsProps) {
+  const navigate = useNavigate();
   const chartData = useMemo(() => {
     const counts: Record<string, number> = {};
     data.forEach((d) => {
@@ -216,6 +253,14 @@ export function RankingAtivos({ data }: ChartsProps) {
       .map(([name, value]) => ({ name, value }));
   }, [data]);
 
+  const handleBarClick = (entry: any) => {
+    if (entry && entry.name) {
+      navigate(`/ordens?ativo=${encodeURIComponent(entry.name)}`);
+    } else {
+      navigate("/ordens");
+    }
+  };
+
   return (
     <div className="chart-container">
       <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wide">
@@ -226,8 +271,12 @@ export function RankingAtivos({ data }: ChartsProps) {
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 20%, 22%)" horizontal={false} />
           <XAxis type="number" tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 11 }} axisLine={false} tickLine={false} />
           <YAxis type="category" dataKey="name" tick={{ fill: "hsl(215, 15%, 55%)", fontSize: 11 }} axisLine={false} tickLine={false} width={75} />
-          <Tooltip contentStyle={tooltipStyle} />
-          <Bar dataKey="value" fill="hsl(199, 80%, 50%)" radius={[0, 4, 4, 0]} />
+          <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "hsl(222, 20%, 22%)", opacity: 0.2 }} />
+          <Bar dataKey="value" fill="hsl(199, 80%, 50%)" radius={[0, 4, 4, 0]} onClick={handleBarClick}>
+            {chartData.map((entry, i) => (
+              <Cell key={i} className="cursor-pointer hover:opacity-80 transition-opacity" />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
