@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { Upload, FileText, CheckCircle2, AlertCircle } from "lucide-react";
 import { parseCSV } from "@/lib/csv-parser";
 import { clearData } from "@/lib/data-store";
-import { importOrdensServico } from "@/services/importService";
+import { importFaturamento } from "@/services/importService";
 import { Button } from "@/components/ui/button";
 
 interface CsvUploadProps {
@@ -24,8 +24,8 @@ export function CsvUpload({ onUploaded }: CsvUploadProps) {
     setStatus("loading");
     setMessage(replaceAll ? "Substituindo todos os dados..." : "Processando e enviando dados...");
     try {
-      const data = await parseCSV(file);
-      if (data.length === 0) {
+      const rawData = await parseCSV(file);
+      if (rawData.length === 0) {
         setStatus("error");
         setMessage("Nenhum registro válido encontrado no arquivo.");
         return;
@@ -35,18 +35,25 @@ export function CsvUpload({ onUploaded }: CsvUploadProps) {
         await clearData();
       }
 
-      const result = await importOrdensServico(data);
+      // Converte valor string → number antes de importar
+      const data = rawData.map(r => ({
+        mes: r.mes ?? "",
+        descricao: r.descricao ?? "",
+        valor: r.valor ? parseFloat(r.valor.replace(",", ".")) : 0,
+      }));
+
+      const result = await importFaturamento(data);
       if (!result.success) {
         setStatus("error");
-        setMessage(`Erro: ${result.error?.message ?? "Falha ao importar."}`);
+        setMessage(`Erro: ${(result.error as any)?.message ?? "Falha ao importar."}`);
         return;
       }
 
       setStatus("success");
       setMessage(
         replaceAll
-          ? `${data.length} ordens de serviço importadas (dados anteriores substituídos).`
-          : `${data.length} ordens de serviço adicionadas ou atualizadas (sem duplicar por número de ordem).`
+          ? `${data.length} registros importados (dados anteriores substituídos).`
+          : `${data.length} registros adicionados ou atualizados.`
       );
       onUploaded?.(data);
     } catch (e) {
@@ -77,11 +84,11 @@ export function CsvUpload({ onUploaded }: CsvUploadProps) {
           className="rounded border-border"
         />
         <span className="text-sm text-foreground">
-          <strong>Substituir todos os dados</strong> — apaga todas as ordens na base e importa só este CSV (evita duplicados).
+          <strong>Substituir todos os dados</strong> — apaga todos os registros na base e importa só este CSV.
         </span>
       </label>
       <p className="text-xs text-muted-foreground">
-        Se desmarcado: adiciona novas ordens e atualiza as existentes pelo número da ordem (não duplica).
+        Se desmarcado: adiciona e atualiza registros existentes sem duplicar.
       </p>
       <div
         className={`border-2 border-dashed rounded-lg p-10 text-center transition-all duration-200 ${

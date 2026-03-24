@@ -1,31 +1,27 @@
 import { supabase } from './supabase';
-import { importOrdensServico } from '@/services/importService';
-import type { OrdemServico, StatusCode, TipoServicoCode } from './types';
+import { importFaturamento } from '@/services/importService';
+import type { RegistroFaturamento } from './types';
 
 const PAGE_SIZE = 1000;
 
-function mapRow(item: Record<string, unknown>): OrdemServico {
+function mapRow(item: Record<string, unknown>): RegistroFaturamento {
   return {
-    ordemServico: (item.ordem_servico as string) ?? '',
+    id: (item.id as string) ?? undefined,
+    mes: (item.mes as string) ?? '',
     descricao: (item.descricao as string) ?? '',
-    local: (item.local as string) ?? '',
-    ativo: (item.ativo as string) ?? '',
-    status: ((item.status_codigo as string) || 'OTHER') as StatusCode,
-    inicioPrevisto: (item.inicio_previsto as string) ?? '',
-    tipoServico: ((item.tipo_servico as string) || 'OTHER') as TipoServicoCode,
-    terminoEfetivo: (item.termino_efetivo as string) ?? '',
+    valor: Number(item.valor) || 0,
   };
 }
 
-export async function loadData(): Promise<OrdemServico[]> {
+export async function loadData(): Promise<RegistroFaturamento[]> {
   try {
-    const allRows: OrdemServico[] = [];
+    const allRows: RegistroFaturamento[] = [];
     let offset = 0;
     let hasMore = true;
 
     while (hasMore) {
       const { data, error } = await supabase
-        .from('ordens_servico')
+        .from('faturamento')
         .select('*')
         .order('id', { ascending: true })
         .range(offset, offset + PAGE_SIZE - 1);
@@ -38,35 +34,32 @@ export async function loadData(): Promise<OrdemServico[]> {
 
     return allRows;
   } catch (error) {
-    console.error('Failed to load data from Supabase', error);
+    console.error('Falha ao carregar dados do Supabase', error);
     return [];
   }
 }
 
 export async function clearData(): Promise<void> {
   try {
-    // Delete all records (requires caution, usually done by deleting where id is not null)
-    const { error } = await supabase.from('ordens_servico').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+    const { error } = await supabase
+      .from('faturamento')
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000');
     if (error) throw error;
   } catch (error) {
-    console.error('Failed to clear data from Supabase', error);
+    console.error('Falha ao limpar dados do Supabase', error);
   }
 }
 
-export async function saveData(data: OrdemServico[]): Promise<void> {
+export async function saveData(data: RegistroFaturamento[]): Promise<void> {
   try {
     const mappedData = data.map(item => ({
-      ordem_servico: item.ordemServico,
+      mes: item.mes,
       descricao: item.descricao,
-      local: item.local,
-      ativo: item.ativo,
-      status_codigo: item.status,
-      inicio_previsto: item.inicioPrevisto,
-      tipo_servico: item.tipoServico,
-      termino_efetivo: item.terminoEfetivo,
+      valor: item.valor,
     }));
-    await importOrdensServico(mappedData);
+    await importFaturamento(mappedData);
   } catch (error) {
-    console.error('Failed to save data to Supabase', error);
+    console.error('Falha ao salvar dados no Supabase', error);
   }
 }

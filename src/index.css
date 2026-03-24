@@ -6,52 +6,66 @@
 
 @layer base {
   :root {
-    /* Fundo roxo muito escuro */
-    --background: 265 60% 8%;
-    --foreground: 210 20% 92%;
+    /* Tema Premium Dark Blue forçado no root (para que sempre pareça o da imagem) */
+    --background: 232 30% 12%; /* Fundo super escuro (night blue) */
+    --foreground: 210 40% 98%;
 
-    /* Cards com um leve tom roxo neon escuro (translúcidos depois) */
-    --card: 265 40% 12%;
-    --card-foreground: 210 20% 92%;
+    --card: 231 28% 16%; /* Azul um pouco mais claro para as caixas */
+    --card-foreground: 210 40% 98%;
 
-    --popover: 265 40% 12%;
-    --popover-foreground: 210 20% 92%;
+    --popover: 231 28% 16%;
+    --popover-foreground: 210 40% 98%;
 
-    /* Accent primário: ciano/verde água neon que combina bem com roxo */
-    --primary: 175 100% 45%;
-    --primary-foreground: 265 60% 8%;
+    --primary: 238 80% 65%; /* Azul Neon suave / Blurple */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 265 30% 18%;
-    --secondary-foreground: 210 20% 85%;
+    --secondary: 230 20% 25%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 265 30% 16%;
-    --muted-foreground: 265 15% 65%;
+    --muted: 230 20% 20%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 280 80% 60%;
+    --accent: 238 80% 65%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 72% 55%;
+    --destructive: 348 83% 47%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 265 30% 20%;
-    --input: 265 30% 20%;
-    --ring: 175 100% 45%;
+    --border: 230 20% 25%; /* Bordas bem escuras, subtis */
+    --input: 230 20% 20%;
+    --ring: 238 80% 65%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Bordas um pouco mais arredondadas para dar o tone moderno */
+  }
 
-    /* Novas cores p/ Gráficos e KPIs no estilo "cyber" */
-    --chart-1: 175 100% 45%; /* Cyan */
-    --chart-2: 280 80% 60%;  /* Purple */
-    --chart-3: 330 80% 60%;  /* Pink */
-    --chart-4: 45 100% 55%;  /* Yellow */
-    --chart-5: 200 100% 50%; /* Blue */
+  .dark {
+    --background: 232 30% 12%;
+    --foreground: 210 40% 98%;
 
-    --kpi-green: 142 60% 50%;
-    --kpi-blue: 199 80% 50%;
-    --kpi-orange: 25 95% 55%;
-    --kpi-purple: 280 65% 60%;
+    --card: 231 28% 16%;
+    --card-foreground: 210 40% 98%;
 
-    font-family: 'DM Sans', sans-serif;
+    --popover: 231 28% 16%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 238 80% 65%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 230 20% 25%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 230 20% 20%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 238 80% 65%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 348 83% 47%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 230 20% 25%;
+    --input: 230 20% 20%;
+    --ring: 238 80% 65%;
   }
 }
 
@@ -61,12 +75,29 @@
   }
 
   body {
-    /* O degradê principal no fundo */
-    background: radial-gradient(circle at top left, hsl(275 50% 15%), hsl(265 60% 6%));
-    background-attachment: fixed;
-    @apply text-foreground antialiased;
-    min-height: 100vh;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Customizações de scrollbar para manter estilo escuro e fino */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
 
 @layer utilities {

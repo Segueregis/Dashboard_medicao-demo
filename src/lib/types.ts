@@ -1,41 +1,55 @@
-export interface OrdemServico {
-  ordemServico: string;
-  descricao: string;
-  local: string;
-  ativo: string;
-  status: StatusCode;
-  inicioPrevisto: string; // YYYY-MM-DD
-  tipoServico: TipoServicoCode;
-  terminoEfetivo?: string;
+// Tipos específicos para o Dashboard de Faturamento Baseado no Excel
+
+export interface DadosBoletim {
+  periodoInicio: number | string; // Serial Excel
+  periodoFim: number | string;
+  dataEnvio: number | string;
+  valorMedido: number;
+  dataLiberacao: number | string;
+  numeroPedido: string;
+  numeroFatura: number | string;
+  valorFatura: number;
+  saldoContrato: number;
 }
 
-export type StatusCode = "APPR" | "COMP" | "INPRG" | "WSCH";
-export type TipoServicoCode = "CM" | "PM" | "PRJ" | "OTHER";
+export interface SpecData {
+  mes: string;
+  valor: number;
+}
 
-export const STATUS_LABELS: Record<StatusCode, string> = {
-  APPR: "Aprovada",
-  COMP: "Concluída",
-  INPRG: "Aguardando Planejamento",
-  WSCH: "Aguardando Planejamento",
-};
+export interface DadosEspecificacao {
+  tipoServico: string;
+  valoresPorMes: SpecData[];
+  total: number;
+}
 
-export const TIPO_SERVICO_LABELS: Record<TipoServicoCode, string> = {
-  CM: "Manutenção Corretiva",
-  PM: "Manutenção Planejada",
-  PRJ: "Ordem de Projetos",
-  OTHER: "Manutenção Predial",
-};
+export interface FaturamentoProcessado {
+  boletim: DadosBoletim[];
+  especificacoes: DadosEspecificacao[];
+  mesesEspecificacoes: string[]; // Cabeçalhos dos meses encontrados na aba ESPECIFICAÇÕES
+}
 
-export const STATUS_COLORS: Record<StatusCode, string> = {
-  APPR: "hsl(45, 100%, 55%)",
-  COMP: "hsl(142, 60%, 50%)",
-  INPRG: "hsl(199, 80%, 50%)",
-  WSCH: "hsl(280, 65%, 60%)",
-};
+export interface ContratoInfo {
+  id: string;
+  nome: string;
+  valorBase: number;
+}
 
-export const TIPO_SERVICO_COLORS: Record<TipoServicoCode, string> = {
-  CM: "hsl(0, 72%, 55%)",
-  PM: "hsl(199, 80%, 50%)",
-  PRJ: "hsl(280, 65%, 60%)",
-  OTHER: "hsl(25, 95%, 55%)",
-};
+export const CONTRATOS_DISPONIVEIS: ContratoInfo[] = [
+  {
+    id: "SPO_00023_25",
+    nome: "Contrato SPO 00023/25",
+    valorBase: 150000000, // R$ 150M assumidos no prompt ou da planilha
+  },
+  {
+    id: "4600172787",
+    nome: "Contrato 4600172787",
+    valorBase: 1572480, // R$ 1.57M assumidos do prompt
+  }
+];
+
+// O estado que armazena os dados processados globalmente
+export interface FaturamentoState {
+  dados: FaturamentoProcessado | null;
+  contratoAtivo: string;
+}
