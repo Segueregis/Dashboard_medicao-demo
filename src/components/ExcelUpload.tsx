@@ -4,6 +4,8 @@
 import { useState, useCallback } from "react";
 import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { parseExcelFile, isSupportedFile } from "@/lib/excel-parser";
+import { processarFaturamentoExcel } from "@/lib/faturamento-parser";
+import { supabase } from "@/lib/supabase";
 import { useExcel } from "@/contexts/ExcelContext";
 import { Button } from "@/components/ui/button";
 
@@ -32,6 +34,31 @@ export function ExcelUpload() {
       const totalRows = sheetNames.reduce((acc, s) => acc + sheets[s].length, 0);
 
       setSheets(sheets, rawSheets, file.name);
+
+      try {
+        const { boletim } = processarFaturamentoExcel(rawSheets);
+        
+        if (replaceAll) {
+          setMessage("Limpando dados antigos no banco...");
+          const { error: deleteError } = await supabase
+            .from('medicoes')
+            .delete()
+            .neq('id', '00000000-0000-0000-0000-000000000000'); // Apaga tudo se replaceAll
+
+          if (deleteError) throw deleteError;
+        }
+
+        setMessage("Salvando novos dados no banco...");
+        // O Supabase JS mapeia as chaves do objeto para as colunas
+        const { error: insertError } = await supabase
+          .from('medicoes')
+          .insert(boletim);
+
+        if (insertError) throw insertError;
+      } catch (dbErr: any) {
+        console.error("Erro ao integrar com Supabase:", dbErr);
+        throw new Error("Falha ao salvar no banco de dados: " + (dbErr.message || ""));
+      }
       setStatus("success");
       setMessage(
         `✅ ${file.name} — ${sheetNames.length} aba(s) carregada(s): ${sheetNames.join(", ")}. Total: ${totalRows.toLocaleString("pt-BR")} linhas.`

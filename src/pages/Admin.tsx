@@ -17,6 +17,21 @@ const Admin = () => {
     navigate("/admin-login");
   };
 
+  const handleClearData = async () => {
+    if (!window.confirm("Tem certeza que deseja apagar todos os dados do sistema e do banco?")) return;
+    try {
+      const { error } = await supabase
+        .from('medicoes')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000');
+      if (error) throw error;
+      clearSheets();
+      alert("Dados apagados com sucesso.");
+    } catch (err: any) {
+      alert("Erro ao apagar dados do banco: " + err.message);
+    }
+  };
+
   return (
     <div className="min-h-screen">
       <header className="dashboard-header px-6 py-4 flex items-center justify-between">
@@ -75,7 +90,7 @@ const Admin = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={clearSheets}
+                onClick={handleClearData}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="h-4 w-4 mr-1" /> Limpar dados

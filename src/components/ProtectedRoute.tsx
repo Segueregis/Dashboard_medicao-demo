@@ -23,7 +23,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
       const email = session.user?.email;
 
-      if (email === "renan.crr@outlook.com") {
+      const allowedAdmins = ["renan.crr@outlook.com", "alex.becooper@outlook.com"];
+      
+      if (email && allowedAdmins.includes(email)) {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);

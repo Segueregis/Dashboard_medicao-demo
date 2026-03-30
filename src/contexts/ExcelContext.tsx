@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useCallback, ReactNode, useMemo } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode, useMemo, useEffect } from "react";
 import { processarFaturamentoExcel } from "@/lib/faturamento-parser";
 import type { FaturamentoProcessado } from "@/lib/types";
+import { supabase } from "@/lib/supabase";
 
 // Cada aba é um array de objetos (linhas), com chaves = cabeçalhos do Excel
 export type SheetData = Record<string, unknown>[];
@@ -37,6 +38,32 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
     fileName: "",
     faturamento: null,
   });
+
+  useEffect(() => {
+    const loadFromDB = async () => {
+      try {
+        const { data, error } = await supabase.from('medicoes').select('*');
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+          setState(prev => ({
+            ...prev,
+            faturamento: {
+              ...(prev.faturamento || { especificacoes: [], mesesEspecificacoes: [] }),
+              boletim: data
+            }
+          }));
+        }
+      } catch (err) {
+        console.error("Erro ao carregar dados do Supabase:", err);
+      }
+    };
+    
+    // Solo carregar se não houver um boletim recém-processado
+    if (!state.faturamento?.boletim?.length) {
+      loadFromDB();
+    }
+  }, []);
 
   const setSheets = useCallback((sheets: Record<string, SheetData>, rawSheets: Record<string, any[][]>, fileName: string) => {
     const firstSheet = Object.keys(sheets)[0] ?? "";

@@ -1,20 +1,31 @@
 -- Schema base para acompanhamento de faturamento
--- Os campos serão refinados após receber a planilha Excel com as colunas definitivas
-
--- Drop da tabela antiga de ordens de serviço (se existir)
-DROP TABLE IF EXISTS public.ordens_servico;
-
--- Drop da tabela de faturamento (se existir)
+-- Drop da tabela antiga de faturamento (se existir)
 DROP TABLE IF EXISTS public.faturamento;
 
--- Criação da tabela de faturamento
-CREATE TABLE public.faturamento (
+-- Drop da tabela nova (se precisar resetar)
+DROP TABLE IF EXISTS public.medicoes;
+
+-- Criação da tabela medicoes (Boletim Mensal)
+CREATE TABLE public.medicoes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    mes TEXT NOT NULL,           -- ex: "Janeiro/2025"
-    descricao TEXT,              -- descrição do lançamento
-    valor NUMERIC(15, 2),        -- valor faturado
+    "periodoInicio" TEXT,
+    "periodoFim" TEXT,
+    "dataEnvio" TEXT,
+    "valorMedido" NUMERIC,
+    "dataLiberacao" TEXT,
+    "numeroPedido" TEXT,
+    "numeroFatura" TEXT,
+    "valorFatura" NUMERIC,
+    "saldoContrato" NUMERIC,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
--- Nota: Campos adicionais serão definidos após análise da planilha Excel.
--- Exemplo de campos futuros: contrato, unidade, tipo_faturamento, etc.
+-- Ativar segurança em nível de linha (RLS)
+ALTER TABLE public.medicoes ENABLE ROW LEVEL SECURITY;
+
+-- Política: Apenas o ADMIN pode INSERIR / DELETAR
+CREATE POLICY "Admin pode inserir" ON public.medicoes FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Admin pode deletar" ON public.medicoes FOR DELETE TO authenticated USING (true);
+
+-- Política: Qualquer usuário pode LER os dados
+CREATE POLICY "Leitura pública" ON public.medicoes FOR SELECT TO anon, authenticated USING (true);
