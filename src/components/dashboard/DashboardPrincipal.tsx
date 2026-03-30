@@ -17,13 +17,13 @@ import { CONTRATOS_DISPONIVEIS } from "@/lib/types";
 import { useState } from "react";
 
 export function DashboardPrincipal() {
-  const { sheetNames, faturamento } = useExcel();
+  const { faturamento } = useExcel();
   const navigate = useNavigate();
   const [contratoAtivoId, setContratoAtivoId] = useState(CONTRATOS_DISPONIVEIS[0].id);
   const [activeTab, setActiveTab] = useState<SidebarTab>("dashboard");
 
-  // Estado 1: Nenhum arquivo carregado
-  if (sheetNames.length === 0) {
+  // Estado: Nenhum dado carregado (nem via Supabase, nem via Excel)
+  if (!faturamento || faturamento.boletim.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background">
         <BarChart3 className="h-16 w-16 text-primary opacity-60" />
@@ -32,33 +32,13 @@ export function DashboardPrincipal() {
             Dashboard — Medição e Faturamento
           </h1>
           <p className="text-muted-foreground mb-6 text-sm">
-            Nenhum dado carregado. Faça upload da planilha estruturada de faturamento.
+            Nenhum dado carregado no banco. Faça o login administrativo para importar a planilha.
           </p>
           <Button
-            onClick={() => navigate("/admin")}
+            onClick={() => navigate("/admin-login")}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            Importar Planilha
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // Estado 2: Arquivo incompatível
-  if (!faturamento) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background">
-        <BarChart3 className="h-16 w-16 text-destructive opacity-60" />
-        <div className="text-center max-w-md">
-          <h1 className="text-xl font-bold text-foreground mb-2">
-            Planilha Incompatível
-          </h1>
-          <p className="text-sm text-muted-foreground mb-6">
-            O arquivo selecionado não contém as abas esperadas.
-          </p>
-          <Button variant="outline" onClick={() => navigate("/admin")}>
-            Voltar para importação
+            Acessar Administração
           </Button>
         </div>
       </div>
