@@ -56,7 +56,7 @@ export function SaldoVsFaturamentoChart({ dados }: Props) {
         <CardDescription>Consumo do contrato ao longo do tempo</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 w-full min-h-0 pt-4">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" debounce={100}>
           <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
             {/* Gradientes para a área */}
             <defs>

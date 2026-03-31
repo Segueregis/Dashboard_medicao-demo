@@ -52,7 +52,7 @@ export function EvolucaoFaturamentoChart({ dados }: Props) {
         <CardDescription>Valor da fatura por início de período medido</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 w-full min-h-0 pt-4">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" debounce={100}>
           <LineChart data={dataWithTrend} margin={{ top: 10, right: 30, left: 20, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
             <XAxis

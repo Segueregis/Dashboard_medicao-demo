@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, ReactNode, useMemo, useEffect } from "react";
 import { processarFaturamentoExcel } from "@/lib/faturamento-parser";
 import type { FaturamentoProcessado } from "@/lib/types";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 // Cada aba é um array de objetos (linhas), com chaves = cabeçalhos do Excel
 export type SheetData = Record<string, unknown>[];
@@ -86,8 +86,8 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
       }
     };
     
-    // Solo carregar se não houver um boletim recém-processado
-    if (!state.faturamento?.boletim?.length) {
+    // Solo carregar se não houver um boletim recém-processado e se o Supabase estiver configurado
+    if (isSupabaseConfigured && !state.faturamento?.boletim?.length) {
       loadFromDB();
     }
   }, []);

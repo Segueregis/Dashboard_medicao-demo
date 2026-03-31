@@ -62,8 +62,8 @@ export function TopServicosDonut({ especificacoes }: Props) {
         <CardTitle className="text-base text-foreground">Proporção das Especificações</CardTitle>
         <CardDescription>Resumo dos valores totais por tipo principal</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 w-full h-[600px] pt-4 pb-6">
-        <ResponsiveContainer width="100%" height="100%">
+      <CardContent className="flex-1 w-full min-h-0 h-[600px] pt-4 pb-6 relative">
+        <ResponsiveContainer width="100%" height="100%" debounce={100}>
           <PieChart margin={{ top: 0, bottom: 20 }}>
             <Pie
               data={chartData}
