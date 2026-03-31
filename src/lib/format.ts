@@ -6,22 +6,20 @@ export function formatCurrency(value: number | undefined | null): string {
   }).format(value);
 }
 
-// Converte serial do Excel (número) para data BR
+// Converte serial do Excel (número ou string numérica) para data BR
 export function formatExcelDate(serial: number | string | undefined | null): string {
-  if (!serial) return "-";
-  
-  if (typeof serial === 'number') {
-    // 25569 = dias entre 1/1/1900 e 1/1/1970
-    const unixTimestamp = (serial - 25569) * 86400 * 1000;
-    // O Excel trata 1900 como bissexto (bug histórico), precisamos ajustar 1 dia para datas após fev 1900
-    // Como estamos no seculo 21, sempre ajustamos
-    const data = new Date(unixTimestamp + (24 * 60 * 60 * 1000) * 0); // Ajuste de fuso pode ser necessário
-    // Uma forma mais segura para evitar problemas de timezone com dias exatos:
-    const utcDate = new Date(Math.round((serial - 25569) * 86400 * 1000));
-    return new Intl.DateTimeFormat('pt-BR', {timeZone: 'UTC'}).format(utcDate);
+  if (!serial && serial !== 0) return "-";
+
+  // Se for string que representa um número (ex: "45859" vindo do banco), converte para number
+  const asNumber = typeof serial === 'number' ? serial : Number(serial);
+
+  if (!isNaN(asNumber) && asNumber > 1000) {
+    // 25569 = dias entre 1/1/1900 e 1/1/1970 (origem Unix)
+    const utcDate = new Date(Math.round((asNumber - 25569) * 86400 * 1000));
+    return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(utcDate);
   }
-  
-  // Se já for string "DD/MM/YYYY", retorna como está
+
+  // Se já for string de data legível, retorna como está
   return String(serial);
 }
 
