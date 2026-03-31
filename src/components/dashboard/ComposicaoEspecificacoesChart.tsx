@@ -73,14 +73,14 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
   const keys = Object.keys(chartData[0]).filter(k => k !== "mes" && k !== "hasData");
 
   return (
-    <Card className="flex flex-col border-border/60 h-[380px] w-full">
+    <Card className="flex flex-col border-border/60 w-full shadow-md h-auto min-h-[640px]">
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-base text-foreground">Distribuição Mensal das Medições</CardTitle>
         <CardDescription>Composição do valor por tipo de serviço (ESPECIFICAÇÕES)</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 w-full min-h-0 pt-4 pb-0">
+      <CardContent className="flex-1 w-full h-[640px] pt-4 pb-6">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+          <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis
               dataKey="mes"
@@ -98,38 +98,40 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
             />
             <Tooltip
               cursor={{ fill: "hsl(var(--muted)/0.3)" }}
+              // Isso permite que o tooltip "vaze" além do topo se precisar
+              allowEscapeViewBox={{ x: false, y: true }}
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   // Calcular total do mês
                   const total = payload.reduce((acc, p) => acc + (p.value as number), 0);
                   
                   return (
-                    <div className="bg-popover text-popover-foreground rounded-lg border shadow-sm p-3 text-sm max-w-[300px]">
-                      <p className="font-semibold mb-2 pb-1 border-b border-border text-xs break-words">
+                    <div className="bg-popover text-popover-foreground rounded-lg border shadow-sm p-4 text-base min-w-[350px] max-w-[500px] z-50">
+                      <p className="font-semibold mb-3 pb-2 border-b border-border text-sm break-words">
                         {label}
                       </p>
-                      <div className="flex flex-col gap-1.5 mt-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="flex flex-col gap-3 mt-3 max-h-[450px] overflow-y-auto pr-3 custom-scrollbar">
                         {payload.map((entry: any, index: number) => {
                           if (entry.value === 0) return null;
                           return (
-                            <div key={`item-${index}`} className="flex flex-col gap-0.5">
-                              <div className="flex items-center gap-1.5 line-clamp-2">
+                            <div key={`item-${index}`} className="flex flex-col gap-1">
+                              <div className="flex items-start gap-2">
                                 <div
-                                  className="w-2 h-2 rounded-full flex-shrink-0 mt-1"
+                                  className="w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1"
                                   style={{ backgroundColor: entry.color }}
                                 />
-                                <span className="text-[10px] text-muted-foreground leading-tight">
+                                <span className="text-xs text-muted-foreground leading-snug">
                                   {entry.name}
                                 </span>
                               </div>
-                              <span className="font-medium text-xs pl-3.5">
+                              <span className="font-semibold text-sm pl-4.5 text-foreground">
                                 {formatCurrency(entry.value)}
                               </span>
                             </div>
                           );
                         })}
                       </div>
-                      <div className="mt-3 pt-2 border-t border-border flex justify-between items-center text-xs font-semibold">
+                      <div className="mt-4 pt-3 border-t border-border flex justify-between items-center text-sm font-bold">
                         <span>Total do Mês:</span>
                         <span>{formatCurrency(total)}</span>
                       </div>
@@ -139,11 +141,25 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
                 return null;
               }}
             />
+            {/* Custom Grid Legend para evitar cortes e mostrar letras maiores */}
             <Legend 
-               wrapperStyle={{ fontSize: "10px" }}
-               iconType="circle"
-               iconSize={8}
-               formatter={(value) => <span className="text-muted-foreground truncate max-w-[150px] inline-block align-bottom">{value}</span>}
+               verticalAlign="bottom"
+               content={(props) => {
+                 const { payload } = props;
+                 if (!payload) return null;
+                 return (
+                   <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 pt-8">
+                     {payload.map((entry, index) => (
+                       <li key={`item-${index}`} className="flex items-start gap-2.5">
+                         <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: entry.color }} />
+                         <span className="text-xs font-semibold text-foreground leading-snug break-words">
+                           {entry.value}
+                         </span>
+                       </li>
+                     ))}
+                   </ul>
+                 );
+               }}
             />
             {keys.map((key, index) => (
               <Bar

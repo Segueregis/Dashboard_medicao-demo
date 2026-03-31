@@ -19,9 +19,9 @@ interface Props {
 const COLORS = [
   "hsl(var(--primary))",
   "#10b981", // emerald-500
-  "#3b82f6", // blue-500
-  "#f59e0b", // amber-500
-  "#8b5cf6", // violet-500
+  "#1764deff", // blue-500
+  "#f5ed0bff", // amber-500
+  "#541bd9ff", // violet-500
   "#ec4899", // pink-500
 ];
 
@@ -30,7 +30,7 @@ export function TopServicosDonut({ especificacoes }: Props) {
   // Ignoramos linhas que funcionam como totais ou subtotais agrupados no Boletim
   const chartData = useMemo(() => {
     // Filtramos nomes que não são serviços concretos
-    const specsToUse = especificacoes.filter(e => 
+    const specsToUse = especificacoes.filter(e =>
       !e.tipoServico.toLowerCase().includes("valor total da medição") &&
       !e.tipoServico.toLowerCase().includes("valor total geral") &&
       e.total > 0
@@ -42,7 +42,7 @@ export function TopServicosDonut({ especificacoes }: Props) {
       name: spec.tipoServico,
       value: spec.total,
       percentStr: formatPercent(spec.total / totalEspec)
-    })).sort((a,b) => b.value - a.value); // Ordenar do maior pro menor
+    })).sort((a, b) => b.value - a.value); // Ordenar do maior pro menor
   }, [especificacoes]);
 
   if (chartData.length === 0) {
@@ -68,16 +68,21 @@ export function TopServicosDonut({ especificacoes }: Props) {
             <Pie
               data={chartData}
               cx="50%"
-              cy="40%"
-              innerRadius={110}
-              outerRadius={155}
+              cy="50%"
+              innerRadius={90}
+              outerRadius={148}
               paddingAngle={2}
               dataKey="value"
               stroke="transparent"
             >
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
+              {chartData.map((entry, index) => {
+                // Se for a categoria específica, usa vermelho (#ef4444), senão usa a cor da paleta
+                const color = entry.name.trim() === "Emergenciais (Booss) - Obras" 
+                  ? "#ef4444" 
+                  : COLORS[index % COLORS.length];
+                  
+                return <Cell key={`cell-${index}`} fill={color} />;
+              })}
             </Pie>
             <Tooltip
               content={({ active, payload }) => {
@@ -86,8 +91,8 @@ export function TopServicosDonut({ especificacoes }: Props) {
                   return (
                     <div className="bg-popover text-popover-foreground rounded-lg border shadow-sm p-3 text-sm max-w-[280px]">
                       <div className="flex items-start gap-2 max-w-full overflow-hidden">
-                        <div 
-                          className="w-3 h-3 rounded-full mt-1 flex-shrink-0" 
+                        <div
+                          className="w-3 h-3 rounded-full mt-1 flex-shrink-0"
                           style={{ backgroundColor: payload[0].payload.fill }}
                         />
                         <p className="font-semibold text-xs leading-tight whitespace-normal break-words">
@@ -109,8 +114,8 @@ export function TopServicosDonut({ especificacoes }: Props) {
               }}
             />
             {/* Legenda Profissional sem scroll, exibindo valores e porcentagens em grid */}
-            <Legend 
-              verticalAlign="bottom" 
+            <Legend
+              verticalAlign="bottom"
               content={(props) => {
                 const { payload } = props;
                 if (!payload) return null;
