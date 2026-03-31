@@ -57,20 +57,20 @@ export function TopServicosDonut({ especificacoes }: Props) {
   }
 
   return (
-    <Card className="flex flex-col border-border/60 h-[530px] w-full shadow-md">
+    <Card className="flex flex-col border-border/60 w-full shadow-md h-auto min-h-[600px]">
       <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-base text-foreground">Proporção das Especificações</CardTitle>
         <CardDescription>Resumo dos valores totais por tipo principal</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 w-full min-h-0 pt-4 pb-0">
+      <CardContent className="flex-1 w-full h-[600px] pt-4 pb-6">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ top: 0, bottom: 20 }}>
             <Pie
               data={chartData}
               cx="50%"
-              cy="50%"
-              innerRadius={100}
-              outerRadius={145}
+              cy="40%"
+              innerRadius={110}
+              outerRadius={155}
               paddingAngle={2}
               dataKey="value"
               stroke="transparent"
@@ -108,25 +108,35 @@ export function TopServicosDonut({ especificacoes }: Props) {
                 return null;
               }}
             />
-            {/* Custom Legend to handle extremely long names */}
+            {/* Legenda Profissional sem scroll, exibindo valores e porcentagens em grid */}
             <Legend 
               verticalAlign="bottom" 
-              height={90} 
-              iconType="circle"
-              iconSize={8}
               content={(props) => {
                 const { payload } = props;
                 if (!payload) return null;
                 return (
-                  <ul className="grid grid-cols-1 gap-1 text-[10px] text-muted-foreground mt-2 max-h-[80px] overflow-y-auto custom-scrollbar pr-2">
-                    {payload.map((entry, index) => (
-                      <li key={`item-${index}`} className="flex items-start gap-1.5">
-                        <div className="w-2 h-2 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: entry.color }} />
-                        <span className="truncate" title={entry.value} style={{ maxWidth: '100%' }}>
-                          {entry.value}
-                        </span>
-                      </li>
-                    ))}
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 pt-4">
+                    {payload.map((entry, index) => {
+                      const itemData = chartData.find(d => d.name === entry.value);
+                      return (
+                        <li key={`item-${index}`} className="flex items-start gap-2.5">
+                          <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: entry.color }} />
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="font-semibold text-foreground text-xs leading-snug break-words">
+                              {entry.value}
+                            </span>
+                            {itemData && (
+                              <span className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1.5">
+                                <span className="font-bold text-primary/90">{formatCurrency(itemData.value)}</span>
+                                <span className="px-1.5 py-0.5 rounded-md bg-accent/10 text-accent font-medium text-[9px]">
+                                  {itemData.percentStr}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 );
               }}
