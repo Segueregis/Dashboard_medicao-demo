@@ -20,11 +20,13 @@ const Admin = () => {
   const handleClearData = async () => {
     if (!window.confirm("Tem certeza que deseja apagar todos os dados do sistema e do banco?")) return;
     try {
-      const { error } = await supabase
-        .from('medicoes')
-        .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000');
-      if (error) throw error;
+      // Apagar Medições
+      await supabase.from('medicoes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      
+      // Apagar Especificações
+      await supabase.from('especificacoes_meses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('especificacoes_valores').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
       clearSheets();
       alert("Dados apagados com sucesso.");
     } catch (err: any) {

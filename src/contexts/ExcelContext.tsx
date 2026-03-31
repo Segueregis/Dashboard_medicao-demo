@@ -42,15 +42,42 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadFromDB = async () => {
       try {
-        const { data, error } = await supabase.from('medicoes').select('*');
-        if (error) throw error;
+        const [medicoesRes, mesesRes, valoresRes] = await Promise.all([
+          supabase.from('medicoes').select('*'),
+          supabase.from('especificacoes_meses').select('*').order('ordem', { ascending: true }),
+          supabase.from('especificacoes_valores').select('*')
+        ]);
+
+        if (medicoesRes.error) throw medicoesRes.error;
+        if (mesesRes.error) throw mesesRes.error;
+        if (valoresRes.error) throw valoresRes.error;
         
-        if (data && data.length > 0) {
+        if (medicoesRes.data && medicoesRes.data.length > 0) {
+          const meses = mesesRes.data?.map(m => m.mes_nome) || [];
+          const valoresRaw = valoresRes.data || [];
+          
+          // Reconstruir array de especificações agrupando por tipoServico
+          const specsMap = new Map<string, any>();
+          
+          valoresRaw.forEach(v => {
+            if (!specsMap.has(v.tipo_servico)) {
+              specsMap.set(v.tipo_servico, {
+                tipoServico: v.tipo_servico,
+                valoresPorMes: [],
+                total: 0
+              });
+            }
+            const spec = specsMap.get(v.tipo_servico)!;
+            spec.valoresPorMes.push({ mes: v.mes_nome, valor: v.valor });
+            spec.total += v.valor;
+          });
+
           setState(prev => ({
             ...prev,
             faturamento: {
-              ...(prev.faturamento || { especificacoes: [], mesesEspecificacoes: [] }),
-              boletim: data
+              boletim: medicoesRes.data,
+              especificacoes: Array.from(specsMap.values()),
+              mesesEspecificacoes: meses
             }
           }));
         }
