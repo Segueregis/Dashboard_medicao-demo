@@ -78,8 +78,8 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
         <CardTitle className="text-base text-foreground">Distribuição Mensal das Medições</CardTitle>
         <CardDescription>Composição do valor por tipo de serviço (ESPECIFICAÇÕES)</CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 w-full min-h-0 h-[640px] pt-4 pb-6 relative">
-        <ResponsiveContainer width="100%" height="100%" debounce={100}>
+      <CardContent className="flex-1 w-full pt-4 pb-6" style={{ minHeight: 600 }}>
+        <ResponsiveContainer width="100%" height={550} debounce={100}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
             <XAxis
