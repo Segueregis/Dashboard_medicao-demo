@@ -1,9 +1,6 @@
 # 📊 Dashboard de Análise de Contratos - Demo
 
-![Dashboard Demo](https://img.shields.io/badge/status-demo-yellow)
-![React](https://img.shields.io/badge/React-18.3-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)
+(https://dashboard-medicao-demo.vercel.app)
 
 ## 🎯 Bem-vindo ao meu projeto!
 
