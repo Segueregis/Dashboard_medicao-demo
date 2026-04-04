@@ -1,6 +1,5 @@
 // src/components/ExcelUpload.tsx
 // Componente de upload que aceita .xlsx, .xls e .csv
-// Lê todas as abas e popula o ExcelContext
 import { useState, useCallback } from "react";
 import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { parseExcelFile, isSupportedFile } from "@/lib/excel-parser";
@@ -8,6 +7,7 @@ import { processarFaturamentoExcel } from "@/lib/faturamento-parser";
 import { supabase } from "@/lib/supabase";
 import { useExcel } from "@/contexts/ExcelContext";
 import { Button } from "@/components/ui/button";
+import { isDemoMode } from "@/config/demo-mode";
 
 export function ExcelUpload() {
   const { setSheets, clearSheets } = useExcel();
@@ -33,22 +33,24 @@ export function ExcelUpload() {
       const sheetNames = Object.keys(sheets);
       const totalRows = sheetNames.reduce((acc, s) => acc + sheets[s].length, 0);
 
+      // Carregar localmente no contexto para visualização imediata
       setSheets(sheets, rawSheets, file.name);
 
       try {
         const { boletim, especificacoes, mesesEspecificacoes } = processarFaturamentoExcel(rawSheets);
         
+        // MODO DEMO: Bypass de persistência
+        if (isDemoMode) {
+          setStatus("success");
+          setMessage(
+            "🔧 Modo Demo: seu arquivo foi processado e exibido temporariamente, mas NÃO foi salvo no banco de dados."
+          );
+          return;
+        }
+
         if (replaceAll) {
           setMessage("Limpando dados antigos no banco...");
-          // Limpar Medições
-          const { error: deleteError } = await supabase
-            .from('medicoes')
-            .delete()
-            .neq('id', '00000000-0000-0000-0000-000000000000'); 
-
-          if (deleteError) throw deleteError;
-
-          // Limpar Especificações
+          await supabase.from('medicoes').delete().neq('id', '00000000-0000-0000-0000-000000000000');
           await supabase.from('especificacoes_meses').delete().neq('id', '00000000-0000-0000-0000-000000000000');
           await supabase.from('especificacoes_valores').delete().neq('id', '00000000-0000-0000-0000-000000000000');
         }
@@ -56,17 +58,12 @@ export function ExcelUpload() {
         setMessage("Salvando novos dados no banco...");
         
         // Inserir Medições (Boletim)
-        const { error: insertError } = await supabase
-          .from('medicoes')
-          .insert(boletim);
+        const { error: insertError } = await supabase.from('medicoes').insert(boletim);
         if (insertError) throw insertError;
 
         // Inserir Cabeçalho de Meses das Especificações
         if (mesesEspecificacoes.length > 0) {
-          const { error: mesesError } = await supabase
-            .from('especificacoes_meses')
-            .insert(mesesEspecificacoes.map((mes, i) => ({ mes_nome: mes, ordem: i })));
-          if (mesesError) throw mesesError;
+          await supabase.from('especificacoes_meses').insert(mesesEspecificacoes.map((mes, i) => ({ mes_nome: mes, ordem: i })));
         }
 
         // Inserir Valores das Especificações
@@ -78,20 +75,16 @@ export function ExcelUpload() {
               valor: v.valor
             }))
           );
-          
           if (valoresToInsert.length > 0) {
-            const { error: valoresError } = await supabase
-              .from('especificacoes_valores')
-              .insert(valoresToInsert);
-            if (valoresError) throw valoresError;
+            await supabase.from('especificacoes_valores').insert(valoresToInsert);
           }
         }
 
         setStatus("success");
         const specValoresCount = especificacoes.flatMap(s => s.valoresPorMes).length;
         setMessage(
-          `✅ ${file.name} — ${sheetNames.join(", ")} processado. ` +
-          `Inseridos: ${boletim.length} boletins, ${mesesEspecificacoes.length} meses e ${specValoresCount} valores de especificações.`
+          `✅ ${file.name} — ${sheetNames.join(", ")} processado e salvo no banco. ` +
+          `Inseridos: ${boletim.length} boletins e ${specValoresCount} valores de especificações.`
         );
       } catch (dbErr: any) {
         console.error("Erro ao integrar com Supabase:", dbErr);
@@ -114,13 +107,11 @@ export function ExcelUpload() {
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) processFile(file);
-    // Reset input para permitir reenviar o mesmo arquivo
     e.target.value = "";
   }, [processFile]);
 
   return (
     <div className="max-w-xl mx-auto space-y-4">
-      {/* Opção substituir */}
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
@@ -133,51 +124,31 @@ export function ExcelUpload() {
         </span>
       </label>
 
-      {/* Área de drop */}
       <div
         className={`border-2 border-dashed rounded-lg p-10 text-center transition-all duration-200 cursor-pointer ${
-          dragging
-            ? "border-primary bg-primary/5 scale-[1.01]"
-            : "border-border hover:border-primary/50 hover:bg-muted/30"
+          dragging ? "border-primary bg-primary/5 scale-[1.01]" : "border-border hover:border-primary/50 hover:bg-muted/30"
         }`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
       >
         <FileSpreadsheet className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
-        <p className="text-foreground font-medium mb-1">
-          Arraste o arquivo Excel ou CSV aqui
-        </p>
-        <p className="text-sm text-muted-foreground mb-4">
-          Suporta <strong>.xlsx</strong>, <strong>.xls</strong> e <strong>.csv</strong>
-        </p>
+        <p className="text-foreground font-medium mb-1">Arraste o arquivo Excel ou CSV aqui</p>
+        <p className="text-sm text-muted-foreground mb-4">Suporta .xlsx, .xls e .csv</p>
         <label>
-          <input
-            type="file"
-            accept=".xlsx,.xls,.csv"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
+          <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect} className="hidden" />
           <Button variant="outline" asChild>
-            <span className="cursor-pointer">
-              <Upload className="h-4 w-4 mr-2" />
-              Selecionar Arquivo
-            </span>
+            <span className="cursor-pointer"><Upload className="h-4 w-4 mr-2" />Selecionar Arquivo</span>
           </Button>
         </label>
       </div>
 
-      {/* Feedback */}
       {status !== "idle" && (
-        <div
-          className={`p-4 rounded-lg flex items-start gap-3 text-sm ${
-            status === "success"
-              ? "bg-green-500/10 text-green-400 border border-green-500/20"
-              : status === "error"
-              ? "bg-destructive/10 text-destructive border border-destructive/20"
-              : "bg-accent/10 text-accent border border-accent/20"
-          }`}
-        >
+        <div className={`p-4 rounded-lg flex items-start gap-3 text-sm ${
+          status === "success" ? "bg-green-500/10 text-green-400 border border-green-500/20" :
+          status === "error" ? "bg-destructive/10 text-destructive border border-destructive/20" :
+          "bg-accent/10 text-accent border border-accent/20"
+        }`}>
           {status === "loading" && <Loader2 className="h-4 w-4 flex-shrink-0 mt-0.5 animate-spin" />}
           {status === "success" && <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" />}
           {status === "error" && <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />}

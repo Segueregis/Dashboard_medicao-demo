@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { ExcelProvider } from "@/contexts/ExcelContext";
+import { DemoBadge } from "@/components/dashboard/DemoBadge";
 
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
@@ -22,6 +23,7 @@ const App = () => (
       <ExcelProvider>
         <Toaster />
         <Sonner />
+        <DemoBadge />
         <BrowserRouter>
           <Routes>
             {/* Dashboard público */}

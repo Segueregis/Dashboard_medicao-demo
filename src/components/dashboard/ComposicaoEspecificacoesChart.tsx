@@ -38,9 +38,9 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
     // Ignora a linha de totais se houver uma linha que contém "Valor total" sem especificação real
     // Mas conforme o excel, todas as linhas têm nome. Vamos pegar os meses da primeira.
     const meses = especificacoes[0].valoresPorMes.map(v => v.mes);
-    
+
     // Ignorar a linha de "Valor total geral" pois distorce o empilhamento
-    const specsToStack = especificacoes.filter(e => 
+    const specsToStack = especificacoes.filter(e =>
       !e.tipoServico.toLowerCase().includes("valor total da medição") &&
       !e.tipoServico.toLowerCase().includes("valor total geral")
     );
@@ -81,7 +81,7 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
       <CardContent className="flex-1 w-full pt-4 pb-6" style={{ minHeight: 600 }}>
         <ResponsiveContainer width="100%" height={550} debounce={100}>
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
             <XAxis
               dataKey="mes"
               tickLine={false}
@@ -104,7 +104,7 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
                 if (active && payload && payload.length) {
                   // Calcular total do mês
                   const total = payload.reduce((acc, p) => acc + (p.value as number), 0);
-                  
+
                   return (
                     <div className="bg-popover text-popover-foreground rounded-lg border shadow-sm p-4 text-base min-w-[350px] max-w-[500px] z-50">
                       <p className="font-semibold mb-3 pb-2 border-b border-border text-sm break-words">
@@ -142,24 +142,24 @@ export function ComposicaoEspecificacoesChart({ especificacoes }: Props) {
               }}
             />
             {/* Custom Grid Legend para evitar cortes e mostrar letras maiores */}
-            <Legend 
-               verticalAlign="bottom"
-               content={(props) => {
-                 const { payload } = props;
-                 if (!payload) return null;
-                 return (
-                   <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 pt-8">
-                     {payload.map((entry, index) => (
-                       <li key={`item-${index}`} className="flex items-start gap-2.5">
-                         <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: entry.color }} />
-                         <span className="text-xs font-semibold text-foreground leading-snug break-words">
-                           {entry.value}
-                         </span>
-                       </li>
-                     ))}
-                   </ul>
-                 );
-               }}
+            <Legend
+              verticalAlign="bottom"
+              content={(props) => {
+                const { payload } = props;
+                if (!payload) return null;
+                return (
+                  <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 pt-8">
+                    {payload.map((entry, index) => (
+                      <li key={`item-${index}`} className="flex items-start gap-2.5">
+                        <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ backgroundColor: entry.color }} />
+                        <span className="text-xs font-semibold text-foreground leading-snug break-words">
+                          {entry.value}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              }}
             />
             {keys.map((key, index) => (
               <Bar

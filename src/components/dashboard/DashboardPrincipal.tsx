@@ -15,6 +15,8 @@ import { TabelaDetalhamentoEspecificacoes } from "./TabelaDetalhamentoEspecifica
 import { Sidebar, type SidebarTab } from "./Sidebar";
 import { CONTRATOS_DISPONIVEIS } from "@/lib/types";
 import { useState } from "react";
+import { isDemoMode } from "@/config/demo-mode";
+import { Badge } from "@/components/ui/badge";
 
 export function DashboardPrincipal() {
   const { faturamento } = useExcel();
@@ -32,7 +34,9 @@ export function DashboardPrincipal() {
             Dashboard — Medição e Faturamento
           </h1>
           <p className="text-muted-foreground mb-6 text-sm">
-            Nenhum dado carregado no banco. Faça o login administrativo para importar a planilha.
+            {isDemoMode 
+              ? "Carregando dados de demonstração..." 
+              : "Nenhum dado carregado no banco. Faça o login administrativo para importar a planilha."}
           </p>
           <Button
             onClick={() => navigate("/admin-login")}
@@ -65,6 +69,11 @@ export function DashboardPrincipal() {
 
           {/* Centro: Títulos / Navegação */}
           <div className="hidden lg:flex items-center justify-center gap-6 text-sm font-medium">
+             {isDemoMode && (
+               <Badge variant="outline" className="bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse">
+                 MODO DEMO
+               </Badge>
+             )}
              <div className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors" onClick={() => alert("Exemplo Fake Tab")}>
                Relatório
              </div>

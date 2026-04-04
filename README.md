@@ -49,5 +49,27 @@ Este projeto foi desenvolvido com:
 - shadcn-ui
 - Tailwind CSS
 
+## 🛠️ Modo Demo (Demonstração)
+
+Este projeto possui um **Modo Demo** integrado que permite visualizar todas as funcionalidades do dashboard com dados fictícios, sem necessidade de configurar um banco de dados Supabase real.
+
+### Como rodar a Demo localmente:
+```sh
+npm run dev:demo
+```
+Isso iniciará o servidor Vite com a variável de ambiente `VITE_DEMO_MODE=true`.
+
+### Características do Modo Demo:
+- **Dados Mockados**: Carrega automaticamente medições e especificações realistas.
+- **Segurança de Escrita**: Um Proxy intercepta todas as chamadas ao cliente Supabase, impedindo qualquer alteração no banco real.
+- **Upload Temporário**: Você pode testar o upload de novos arquivos Excel. Os dados serão processados e exibidos nos gráficos, mas não serão salvos.
+- **Bypass de Admin**: A área administrativa aceita qualquer e-mail/senha para facilitar a navegação.
+- **Identificação Visual**: Um badge pulsante e banners de aviso indicam que você está no ambiente de demonstração.
+
+### Como buildar para produção com Demo:
+```sh
+npm run build:demo
+```
+
 
 

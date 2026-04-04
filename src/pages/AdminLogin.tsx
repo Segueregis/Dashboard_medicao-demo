@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft } from "lucide-react";
+import { isDemoMode } from "@/config/demo-mode";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -20,6 +21,13 @@ export default function AdminLogin() {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
+
+    if (isDemoMode) {
+      // No modo demo, aceitamos qualquer login
+      setLoading(false);
+      navigate("/admin");
+      return;
+    }
 
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
