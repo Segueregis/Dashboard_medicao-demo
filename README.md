@@ -1,75 +1,71 @@
-# Bem-vindo ao projeto Dashboard — Ordens de Serviço VEOLIA
+# 📊 Dashboard de Análise de Contratos - Demo
 
+![Dashboard Demo](https://img.shields.io/badge/status-demo-yellow)
+![React](https://img.shields.io/badge/React-18.3-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)
 
-## Informações do projeto
+## 🎯 Bem-vindo ao meu projeto!
 
-**URL**: https://dashboard-veolia-os.netlify.app
+Este é um **Dashboard de Análise de Dados de Contratos** desenvolvido para gestão e monitoramento de medições contratuais. O sistema permite visualizar métricas importantes, evolução de faturamento e distribuição de custos por tipo de serviço.
 
-## Como posso editar este código?
+> ⚠️ **Versão de Demonstração**  
+> Esta é uma versão pública com **dados fictícios** para demonstração. O código original é privado e contém dados reais.
 
-USE A IDE DA SUA PREFERENCIA 
+---
 
+## ✨ Funcionalidades
 
-**Use sua IDE preferida**
+- 📈 **Dashboard interativo** com gráficos dinâmicos
+- 📊 **Evolução do faturamento** ao longo do tempo
+- 🥧 **Distribuição por tipo de serviço** (Preventivas, Corretivas, Emergenciais, Obras)
+- 💰 **KPIs em tempo real** (Total faturado, Saldo do contrato, % executado)
+- 📂 **Upload de planilhas Excel** para visualização temporária
+- 🔒 **Modo Demo seguro** (dados fictícios, sem persistência)
 
-Se você quiser trabalhar localmente usando sua própria IDE, pode clonar este repositório e enviar as alterações. As alterações enviadas também serão refletidas no Lovable.
+---
 
-O único requisito é ter o Node.js e o npm instalados - [instale com nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Tecnologias Utilizadas
 
-Siga estes passos:
+| Tecnologia | Descrição |
+|------------|-----------|
+| **React 18** | Biblioteca para construção da UI |
+| **TypeScript** | Tipagem estática e maior segurança |
+| **Vite** | Build tool rápida e moderna |
+| **Tailwind CSS** | Estilização utilitária |
+| **shadcn/ui** | Componentes acessíveis e customizáveis |
+| **Recharts** | Biblioteca de gráficos |
+| **Supabase** | Backend e autenticação (bloqueado na demo) |
+| **Vercel** | Hospedagem e deploy |
 
-```sh
+---
 
-#Passo 1: Clone o repositório usando a URL Git do projeto.
+## 🚀 Como executar localmente
 
-git clone <SUA_URL_GIT>
+```bash
+# Clone o repositório
+git clone https://github.com/Seguealex/Dashboard-medicao-demostra-o.git
 
-# Passo 2: Navegue até o diretório do projeto.
+# Entre na pasta
+cd Dashboard-medicao-demostra-o
 
-cd <NOME_DO_SEU_PROJETO>
+# Instale as dependências
+npm install
 
-#Passo 3: Instale as dependências necessárias.
-
-npm i
-
-# Passo 4: Inicie o servidor de desenvolvimento com recarregamento automático e pré-visualização instantânea.
-
-npm run dev
-
-```
-
-
-## Quais tecnologias são usadas neste projeto?
-
-Este projeto foi desenvolvido com:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## 🛠️ Modo Demo (Demonstração)
-
-Este projeto possui um **Modo Demo** integrado que permite visualizar todas as funcionalidades do dashboard com dados fictícios, sem necessidade de configurar um banco de dados Supabase real.
-
-### Como rodar a Demo localmente:
-```sh
+# Execute em modo demo
 npm run dev:demo
-```
-Isso iniciará o servidor Vite com a variável de ambiente `VITE_DEMO_MODE=true`.
+A aplicação estará disponível em http://localhost:5173
 
-### Características do Modo Demo:
-- **Dados Mockados**: Carrega automaticamente medições e especificações realistas.
-- **Segurança de Escrita**: Um Proxy intercepta todas as chamadas ao cliente Supabase, impedindo qualquer alteração no banco real.
-- **Upload Temporário**: Você pode testar o upload de novos arquivos Excel. Os dados serão processados e exibidos nos gráficos, mas não serão salvos.
-- **Bypass de Admin**: A área administrativa aceita qualquer e-mail/senha para facilitar a navegação.
-- **Identificação Visual**: Um badge pulsante e banners de aviso indicam que você está no ambiente de demonstração.
+📁 Estrutura do Projeto
 
-### Como buildar para produção com Demo:
-```sh
-npm run build:demo
-```
-
-
-
+text
+src/
+├── components/       # Componentes reutilizáveis
+│   └── dashboard/    # Componentes do dashboard
+├── contexts/         # Contextos React (ExcelContext)
+├── config/           # Configurações (modo demo)
+├── lib/              # Utilitários e cliente Supabase
+├── pages/            # Páginas (Admin, Dashboard)
+├── services/         # Serviços de dados
+├── types/            # Definições TypeScript
+└── hooks/            # Hooks customizados
