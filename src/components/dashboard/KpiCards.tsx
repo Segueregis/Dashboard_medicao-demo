@@ -42,7 +42,7 @@ export function KpiCards({ dados, contrato }: Props) {
           <Wallet className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-xl font-bold text-foreground">
             {formatCurrency(totalContratos)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -59,7 +59,7 @@ export function KpiCards({ dados, contrato }: Props) {
           <CheckCircle className="h-4 w-4 text-green-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-xl font-bold text-foreground">
             {formatCurrency(totalFaturado)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -76,7 +76,7 @@ export function KpiCards({ dados, contrato }: Props) {
           <Target className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-xl font-bold text-foreground">
             {formatCurrency(saldoRemanescente)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -93,7 +93,7 @@ export function KpiCards({ dados, contrato }: Props) {
           <TrendingUp className="h-4 w-4 text-orange-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-xl font-bold text-foreground">
             {formatPercent(percentExecutado)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -110,7 +110,7 @@ export function KpiCards({ dados, contrato }: Props) {
           <CalendarDays className="h-4 w-4 text-purple-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">
+          <div className="text-xl font-bold text-foreground">
             {formatCurrency(ultimaMedicao)}
           </div>
           <p className="text-xs text-muted-foreground mt-1">
