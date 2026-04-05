@@ -2,6 +2,9 @@
 
 (https://dashboard-medicao-demo.vercel.app)
 
+
+<img width="1259" height="748" alt="Captura de Tela 2026-04-05 às 10 55 41" src="https://github.com/user-attachments/assets/a1662b06-96d2-4125-b9eb-1c894ed0261c" />
+
 ## 🎯 Bem-vindo ao meu projeto!
 
 Este é um **Dashboard de Análise de Dados de Contratos** desenvolvido para gestão e monitoramento de medições contratuais. O sistema permite visualizar métricas importantes, evolução de faturamento e distribuição de custos por tipo de serviço.
