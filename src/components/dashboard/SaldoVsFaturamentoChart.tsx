@@ -19,7 +19,7 @@ interface Props {
   contrato: ContratoInfo;
 }
 
-export function SaldoVsFaturamentoChart({ dados }: Props) {
+export function SaldoVsFaturamentoChart({ dados, contrato }: Props) {
   // Transforma os dados. A lógica: Saldo pode vir do próprio boletim (saldoContrato) 
   // Ou calculado (Total - acumulado). Vamos usar o oficial do boletim quando disponível.
   const chartData = useMemo(() => {
@@ -33,10 +33,10 @@ export function SaldoVsFaturamentoChart({ dados }: Props) {
           periodo: formatExcelDate(d.periodoInicio),
           faturamentoAcumulado: acumulado,
           // Se o saldoContrato do boletim for 0, decrescemos do valor total
-          saldo: d.saldoContrato > 0 ? d.saldoContrato : (150000000 - acumulado),
+          saldo: d.saldoContrato > 0 ? d.saldoContrato : (contrato.valorBase - acumulado),
         };
       });
-  }, [dados]);
+  }, [dados, contrato.valorBase]);
 
   if (chartData.length === 0) {
     return (

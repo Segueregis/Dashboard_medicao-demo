@@ -39,7 +39,7 @@ export const CONTRATOS_DISPONIVEIS: ContratoInfo[] = [
   {
     id: "SPO_00023_25",
     nome: "Contrato SPO 00023/25",
-    valorBase: 150000000, // R$ 150M assumidos no prompt ou da planilha
+    valorBase: 120000000, // R$ 120M assumidos no prompt ou da planilha
   },
   {
     id: "4600172787",

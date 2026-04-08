@@ -15,7 +15,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600001",
       numeroFatura: "FAT-001",
       valorFatura: 1250000.50,
-      saldoContrato: 148749999.50
+      saldoContrato: 118749999.50
     },
     {
       periodoInicio: "Fev/24",
@@ -26,7 +26,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600002",
       numeroFatura: "FAT-002",
       valorFatura: 1350400.75,
-      saldoContrato: 147399598.75
+      saldoContrato: 117399598.75
     },
     {
       periodoInicio: "Mar/24",
@@ -37,7 +37,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600003",
       numeroFatura: "FAT-003",
       valorFatura: 1450200.00,
-      saldoContrato: 145949398.75
+      saldoContrato: 115949398.75
     },
     {
       periodoInicio: "Abr/24",
@@ -48,7 +48,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600004",
       numeroFatura: "FAT-004",
       valorFatura: 1550800.25,
-      saldoContrato: 144398598.50
+      saldoContrato: 114398598.50
     },
     {
       periodoInicio: "Mai/24",
@@ -59,7 +59,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600005",
       numeroFatura: "FAT-005",
       valorFatura: 1650300.50,
-      saldoContrato: 142748298.00
+      saldoContrato: 112748298.00
     },
     {
       periodoInicio: "Jun/24",
@@ -70,7 +70,7 @@ export const demoData: FaturamentoProcessado = {
       numeroPedido: "4600006",
       numeroFatura: "FAT-006",
       valorFatura: 1750100.00,
-      saldoContrato: 140998198.00
+      saldoContrato: 110998198.00
     }
   ],
   especificacoes: [
